@@ -23,6 +23,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/version', function () {
+    return '1.0.1';
+});
+
 Route::get('/lang', function () {
     return __("auth.failed");
 });
