@@ -1,0 +1,34 @@
+name: Laravel
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: 7.4
+      - uses: "ramsey/composer-install@v1"
+        with:
+          composer-options: ""
+      - name: Sync
+        env:
+          dest: "ubuntu@dev.kelasdevops.xyz:~/dev.kelasdevops.xyz/"
+        run: |
+          echo "${{secrets.DEPLOY_KEY}}" > ~/deploy_key
+          chmod 600 ~/deploy_key
+          rsync -chav --delete \
+            -e 'ssh -i ~/deploy_key -o StrictHostKeyChecking=no' \
+            --exclude ~/deploy_key \
+            --exclude .git/ \
+            --exclude .github/ \
+            --exclude storage/ \
+            --exclude .env \
+            ./ ${{env.dest}}
